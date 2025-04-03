@@ -16,8 +16,11 @@ import javax.swing.table.AbstractTableModel;
 public class SearchPersonTableModel extends AbstractTableModel {
 
     private List<Person> data = new LinkedList<>();
-
     private String[] columns = {"Nome", "Idade", "CPF", "Endereço"};
+
+    public void setData(List<Person> data) {
+        this.data = data;
+    }
 
     @Override
     public int getRowCount() {

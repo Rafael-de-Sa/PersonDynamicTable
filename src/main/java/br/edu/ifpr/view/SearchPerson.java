@@ -4,8 +4,13 @@
  */
 package br.edu.ifpr.view;
 
+import br.edu.ifpr.model.Person;
+import br.edu.ifpr.view.tablemodel.PersonTableModel;
 import br.edu.ifpr.view.tablemodel.SearchComboBoxModel;
 import br.edu.ifpr.view.tablemodel.SearchPersonTableModel;
+import java.util.ArrayList;
+import java.util.List;
+import javax.swing.JOptionPane;
 import javax.swing.ListModel;
 
 /**
@@ -13,9 +18,9 @@ import javax.swing.ListModel;
  * @author rafae
  */
 public class SearchPerson extends javax.swing.JFrame {
-    
+
     private SearchPersonTableModel searchPersonTableModel = new SearchPersonTableModel();
-    private String[] fields = {"Nome", "Idade", "CPF", "Endereço"};
+    private PersonTableModel sourceModel;
 
     /**
      * Creates new form SearchPerson
@@ -25,6 +30,14 @@ public class SearchPerson extends javax.swing.JFrame {
         setTitle("Pesquisar Cadastro");
         tbFilteredPerson.setModel(searchPersonTableModel);
         cbField.setModel(new SearchComboBoxModel());
+    }
+
+    public SearchPerson(PersonTableModel sourceModel) {
+        initComponents();
+        setTitle("Pesquisar Cadastro");
+        tbFilteredPerson.setModel(searchPersonTableModel);
+        cbField.setModel(new SearchComboBoxModel());
+        this.sourceModel = sourceModel;
     }
 
     /**
@@ -47,7 +60,7 @@ public class SearchPerson extends javax.swing.JFrame {
 
         jButton1.setText("jButton1");
 
-        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 
         lbSearch.setText("Pesquisar:");
 
@@ -57,7 +70,6 @@ public class SearchPerson extends javax.swing.JFrame {
             }
         });
 
-        cbField.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "<fields>" }));
         cbField.setToolTipText("");
         cbField.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -68,6 +80,11 @@ public class SearchPerson extends javax.swing.JFrame {
         lbField.setText("Campo:");
 
         btnSearch.setText("Pesquisar");
+        btnSearch.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnSearchActionPerformed(evt);
+            }
+        });
 
         tbFilteredPerson.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
@@ -128,6 +145,74 @@ public class SearchPerson extends javax.swing.JFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_cbFieldActionPerformed
 
+    private void btnSearchActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSearchActionPerformed
+        // TODO add your handling code here:
+        String searchValue = ftSearch.getText().trim();
+        String selectedField = (String) cbField.getSelectedItem();
+
+        if (sourceModel == null) {
+            JOptionPane.showMessageDialog(this, "Não há dados para pesquisar!");
+        }
+        List<Person> allPersons = getAllPersonFromSourceModel();
+
+        List<Person> filteredPersons = filterPersons(allPersons, selectedField, searchValue);
+
+        searchPersonTableModel.setData(filteredPersons);
+        searchPersonTableModel.fireTableDataChanged();
+
+    }//GEN-LAST:event_btnSearchActionPerformed
+
+    private List<Person> getAllPersonFromSourceModel() {
+        List<Person> persons = new ArrayList<>();
+        int row = sourceModel.getRowCount();
+        for (int i = 0; i < row; i++) {
+            persons.add(sourceModel.get(i));
+        }
+        return persons;
+    }
+
+    private List<Person> filterPersons(List<Person> allPersons, String selectedField, String searchValue) {
+        List<Person> filteredPersons = new ArrayList<>();
+
+        if (searchValue.isEmpty()) {
+            return allPersons;
+        }
+
+        String fieldName = SearchComboBoxModel.getFieldName(selectedField);
+
+        for (Person person : allPersons) {
+
+            switch (fieldName) {
+                case "name":
+                    if (person.getName().toLowerCase().contains(searchValue.toLowerCase())) {
+                        filteredPersons.add(person);
+                    }
+                    break;
+                case "age":
+                    try {
+                        int searchAge = Integer.parseInt(searchValue);
+                        if (person.getAge() == searchAge) {
+                            filteredPersons.add(person);
+                        }
+                    } catch (NumberFormatException e) {
+
+                    }
+                    break;
+                case "cpf":
+                    if (person.getCpf().contains(searchValue)) {
+                        filteredPersons.add(person);
+                    }
+                    break;
+                case "address":
+                    if (person.getAddress().toLowerCase().contains(searchValue.toLowerCase())) {
+                        filteredPersons.add(person);
+                    }
+                    break;
+            }
+        }
+        return filteredPersons;
+    }
+
     /**
      * @param args the command line arguments
      */
@@ -159,7 +244,7 @@ public class SearchPerson extends javax.swing.JFrame {
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
                 new SearchPerson().setVisible(true);
-                
+
             }
         });
     }

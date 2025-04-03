@@ -13,7 +13,7 @@ import javax.swing.JOptionPane;
  * @author rafae
  */
 public class RegisterPerson extends javax.swing.JFrame {
-    
+
     private PersonTableModel personTableModel = new PersonTableModel();
 
     /**
@@ -182,7 +182,7 @@ public class RegisterPerson extends javax.swing.JFrame {
         int age = Integer.valueOf(tfAge.getText());
         String cpf = tfCPF.getText();
         String address = tfAddress.getText();
-        
+
         Person p = new Person(name, age, cpf, address);
         personTableModel.add(p);
     }//GEN-LAST:event_btnRegistrerActionPerformed
@@ -215,7 +215,7 @@ public class RegisterPerson extends javax.swing.JFrame {
 
     private void btnSearchActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSearchActionPerformed
         // TODO add your handling code here:
-        new SearchPerson().setVisible(true);
+        new SearchPerson(personTableModel).setVisible(true);
     }//GEN-LAST:event_btnSearchActionPerformed
 
     /**
